@@ -1,0 +1,35 @@
+
+
+# 🧠 Step 2: Train and save a simple model
+import joblib
+from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+X = np.array([[3, 0, 22.0, 7.25], [1, 1, 38.0, 71.28]])
+y = np.array([0, 1])  # Labels
+
+model = RandomForestClassifier()
+model.fit(X, y)
+joblib.dump(model, "model.pkl")
+
+# 📡 Step 3: Create and run the Flask app
+from flask import Flask, request, jsonify
+import joblib
+import numpy as np
+
+app = Flask(__name__)
+model = joblib.load("model.pkl")
+
+@app.route("/")
+def home():
+    return "🚀 Hello everyone!"
+
+@app.route("/predict", methods=["POST"])
+def predict():
+    data = request.get_json()
+    features = np.array(data["features"]).reshape(1, -1)
+    prediction = model.predict(features)
+    return jsonify({"prediction": int(prediction[0])})
+
+if __name__ == "__main__":
+    app.run(debug=False)
